@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option csharp_namespace = "StudentServer";
+
+service Student{
+	rpc GetStudentInfo (StudentLookupModel) returns (StudentModel);
+	rpc GetNewStudents (NewStudentRequest) returns (stream StudentModel);
+}
+
+message NewStudentRequest{
+
+}
+
+message StudentLookupModel{
+	int32 userId =1;
+}
+message StudentModel{
+	string firtName = 1;
+	string lastName = 2;
+	string fatherName = 3;
+	string address = 4;
+	string emailAddress = 5;
+	string phone = 6;
+	bool isActive = 7;
+	int32 age = 8;
+	int32 course = 9;
+}

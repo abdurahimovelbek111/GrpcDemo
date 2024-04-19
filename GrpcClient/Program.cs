@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using Grpc.Net.Client;
 using GrpcServer;
+using StudentServer;
 
 public class Program
 {
@@ -34,8 +35,7 @@ public class Program
         var channel = GrpcChannel.ForAddress("https://localhost:7112");
         var customerClient = new Customer.CustomerClient(channel);
 
-        Console.WriteLine("New Customer List");
-        Console.WriteLine();
+        Console.WriteLine("New Customer List\n");
 
         using(var call = customerClient.GetNewCustomers(new NewCustomerRequest()))
         {
@@ -47,6 +47,23 @@ public class Program
                     $"Email address : {currentCustomer.EmailAddress} | Is active : {currentCustomer.IsActive}");
             }
         }
+
+        await Console.Out.WriteLineAsync("\nStudents informations\n");
+
+        channel = GrpcChannel.ForAddress("https://localhost:7282");
+        var studentClient = new Student.StudentClient(channel);
+
+        using (var call = studentClient.GetNewStudents(new NewStudentRequest()))
+        {
+            while (await call.ResponseStream.MoveNext())
+            {
+                var currentStudent = call.ResponseStream.Current;
+
+                Console.WriteLine($"Firt name : {currentStudent.FirtName} | Last name : {currentStudent.LastName} | Father name : {currentStudent.FatherName} | Address : {currentStudent.Address}" +
+                    $"Email address : {currentStudent.EmailAddress} | Phone : {currentStudent.Phone} | Is active : {currentStudent.IsActive} | Course : {currentStudent.Course}");
+            }
+        }
+
         Console.ReadLine();
         #endregion
     }

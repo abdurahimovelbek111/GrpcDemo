@@ -1,83 +1,76 @@
 ﻿using Grpc.Core;
 
-namespace GrpcServer.Services
+namespace GrpcServer.Services;
+
+public class CustomersService : Customer.CustomerBase
 {
-    public class CustomersService : Customer.CustomerBase
+    public override Task<CustomerModel> GetCustomerInfo(CustomerLookupModel request, ServerCallContext context)
     {
-        private readonly ILogger<CustomersService> _logger;
-        public CustomersService(ILogger<CustomersService> logger)
+        CustomerModel output = new CustomerModel();
+      
+        switch (request.UserId)
         {
-            _logger = logger;
+            case 1:
+                output.FirtName = "Maykl";
+                output.LastName = "Jekson";
+                break;
+            case 2:
+                output.FirtName = "Pavel";
+                output.LastName = "Durov";
+                break;
+            case 3:
+                output.FirtName = "Mark";
+                output.LastName = "Suberbek";
+                break;
+            default:
+                output.FirtName = "Elbek";
+                output.LastName = "Abdurahimov";
+                break;
         }
+        return Task.FromResult(output);
+    }
 
-        public override Task<CustomerModel> GetCustomerInfo(CustomerLookupModel request, ServerCallContext context)
+    public override async Task GetNewCustomers(
+        NewCustomerRequest request,
+        IServerStreamWriter<CustomerModel> responseStream,
+        ServerCallContext context)
+    {
+        List<CustomerModel> customers = new List<CustomerModel>()
         {
-            CustomerModel output = new CustomerModel();
-          
-            switch (request.UserId)
+            new CustomerModel()
             {
-                case 1:
-                    output.FirtName = "Maykl";
-                    output.LastName = "Jekson";
-                    break;
-                case 2:
-                    output.FirtName = "Pavel";
-                    output.LastName = "Durov";
-                    break;
-                case 3:
-                    output.FirtName = "Mark";
-                    output.LastName = "Suberbek";
-                    break;
-                default:
-                    output.FirtName = "Elbek";
-                    output.LastName = "Abdurahimov";
-                    break;
+                FirtName = "Maykl",
+                LastName = "Jekson",
+                EmailAddress ="maykljeakson@gmail.com",
+                IsActive = true
+            },
+            new CustomerModel()
+            {
+                FirtName = "Pavel",
+                LastName = "Durov",
+                EmailAddress ="paveldurov@gmail.com",
+                IsActive = false
+            },
+            new CustomerModel()
+            {
+                FirtName = "Mark",
+                LastName = "Suberbek",
+                EmailAddress ="marksuberbek@gmail.com",
+                IsActive = false
+            },
+            new CustomerModel()
+            {
+                FirtName = "Elbek",
+                LastName = "Abdurahimov",
+                 EmailAddress ="elbekabdurahimov@gmail.com",
+                IsActive = true
             }
-            return Task.FromResult(output);
-        }
+        };
 
-        public override async Task GetNewCustomers(
-            NewCustomerRequest request,
-            IServerStreamWriter<CustomerModel> responseStream,
-            ServerCallContext context)
+        foreach (var customer in customers)
         {
-            List<CustomerModel> customers = new List<CustomerModel>()
-            {
-                new CustomerModel()
-                {
-                    FirtName = "Maykl",
-                    LastName = "Jekson",
-                    EmailAddress ="maykljeakson@gmail.com",
-                    IsActive = true
-                },
-                new CustomerModel()
-                {
-                    FirtName = "Pavel",
-                    LastName = "Durov",
-                    EmailAddress ="paveldurov@gmail.com",
-                    IsActive = false
-                },
-                new CustomerModel()
-                {
-                    FirtName = "Mark",
-                    LastName = "Suberbek",
-                    EmailAddress ="marksuberbek@gmail.com",
-                    IsActive = false
-                },
-                new CustomerModel()
-                {
-                    FirtName = "Elbek",
-                    LastName = "Abdurahimov",
-                     EmailAddress ="elbekabdurahimov@gmail.com",
-                    IsActive = true
-                }
-            };
-
-            foreach (var customer in customers)
-            {
-                await  Task.Delay(1000);
-                await responseStream.WriteAsync(customer);
-            }
+            await  Task.Delay(1000);
+            await responseStream.WriteAsync(customer);
         }
     }
 }
